@@ -6,7 +6,7 @@ import { User, UserSchema } from './schemas/user.schema';
 import { AuthModule } from 'src/auth/auth.module';
 import { UsersRepository } from './repositories/user.repository';
 import { JwtService } from '@nestjs/jwt';
-import { AuthService } from 'src/auth/auth.service';
+import { AuthService } from '../auth/auth.service';
 import { MoviesService } from './movies.service';
 import { Watchlist, WatchlistSchema } from './schemas/watchlist.schema';
 import { WatchlistRepository } from './repositories/watchlist.repository';
