@@ -2,10 +2,10 @@ import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
-import { User, UserSchema } from 'src/users/schemas/user.schema';
+import { User, UserSchema } from '../users/schemas/user.schema';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UsersModule } from 'src/users/user.module';
-import { UsersRepository } from 'src/users/repositories/user.repository';
+import { UsersModule } from '../users/user.module';
+import { UsersRepository } from '../users/repositories/user.repository';
 import { JwtStrategy } from './jwt.strategy';
 
 @Module({

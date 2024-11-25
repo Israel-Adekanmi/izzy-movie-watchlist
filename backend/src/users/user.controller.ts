@@ -14,7 +14,7 @@ import { UsersService } from './user.service';
 import { CreateUserDto, LoginDto, UpdateProfile } from './dto/create-user.dto';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { MoviesService } from './movies.service';
-import { AuthGuard } from 'src/auth/jwt-auth.guard';
+import { AuthGuard } from '../auth/jwt-auth.guard';
 import { WatchlistService } from './watchlist.service';
 import {
   AddMovieDto,
