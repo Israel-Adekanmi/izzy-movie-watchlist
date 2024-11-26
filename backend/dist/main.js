@@ -13,6 +13,7 @@ async function bootstrap() {
     app.enableCors({
         origin: [
             'https://izzy-movie-watchlist-2iw1.vercel.app',
+            'https://izzy-watch-movie-16.onrender.com',
             'http://localhost:5173',
         ],
         credentials: true,
