@@ -2,10 +2,16 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-// import { ClassTransformerModule } from 'class-transformer';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import * as express from 'express';
+
+const expressApp = express();
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(
+    AppModule,
+    new ExpressAdapter(expressApp),
+  );
   app.enableCors({
     origin: 'https://izzy-movie-watchlist-y9aw.vercel.app/',
     credentials: true,
@@ -14,9 +20,9 @@ async function bootstrap() {
   // Enable global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // Removes extra properties not defined in the DTO
-      forbidNonWhitelisted: true, // Throws an error for properties not defined in the DTO
-      transform: true, // Enables automatic transformation of payloads to match DTO types
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
     }),
   );
 
@@ -26,13 +32,18 @@ async function bootstrap() {
     .setDescription('API documentation for Movie Watchlist application')
     .setVersion('1.0')
     .addBearerAuth()
-    .addTag('movie-watchlist') // Optional: Add custom tags for your API
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/v1/docs', app, document); // Expose Swagger at /api/docs
+  SwaggerModule.setup('api/v1/docs', app, document);
 
-  // Start the server
-  await app.listen(process.env.PORT || 3015);
+  // Initialize the app without listening (for serverless compatibility)
+  await app.init();
 }
+
 bootstrap();
+
+// Export the handler function for Vercel
+export const handler = (req: any, res: any) => {
+  expressApp(req, res);
+};
