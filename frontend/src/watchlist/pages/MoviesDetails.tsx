@@ -23,10 +23,10 @@ const MovieDetailsPage: React.FC = () => {
   useEffect(() => {
     if (!id) return;
 
-    if (!token) {
-        navigate("/login");
-        return;
-      }
+    // if (!token) {
+    //     navigate("/login");
+    //     return;
+    //   }
 
       const fetchMovieDetails = async () => {
         setLoadingDetails(true);
