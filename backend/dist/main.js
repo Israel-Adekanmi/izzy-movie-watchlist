@@ -14,7 +14,7 @@ async function bootstrap() {
         origin: [
             'https://izzy-movie-watchlist-2iw1.vercel.app',
             'https://izzy-watch-movie-16.onrender.com',
-            'http://localhost:5173',
+            'http://localhost:4173',
         ],
         credentials: true,
     });
