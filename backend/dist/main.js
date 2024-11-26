@@ -11,7 +11,10 @@ const expressApp = express();
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule, new platform_express_1.ExpressAdapter(expressApp));
     app.enableCors({
-        origin: 'https://izzy-movie-watchlist-y9aw.vercel.app/',
+        origin: [
+            'https://izzy-movie-watchlist-2iw1.vercel.app',
+            'http://localhost:5173',
+        ],
         credentials: true,
     });
     app.useGlobalPipes(new common_1.ValidationPipe({

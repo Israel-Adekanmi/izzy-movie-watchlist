@@ -13,8 +13,11 @@ async function bootstrap() {
     new ExpressAdapter(expressApp),
   );
   app.enableCors({
-    origin: 'https://izzy-movie-watchlist-y9aw.vercel.app/',
-    credentials: true,
+    origin: [
+      'https://izzy-movie-watchlist-2iw1.vercel.app', // Deployed frontend
+      'http://localhost:5173', // Local development frontend
+    ],
+    credentials: true, // Allow cookies or authentication headers
   });
 
   // Enable global validation pipe
