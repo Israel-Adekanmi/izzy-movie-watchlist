@@ -2,11 +2,15 @@ import { UsersRepository } from './repositories/user.repository';
 import { CreateUserDto, tokenDto, UpdateProfile } from './dto/create-user.dto';
 import { AuthService } from '../auth/auth.service';
 import { EmailService } from 'src/common/email/email.service';
+import { ReminderRepository } from './repositories/reminder.repository';
+import { MoviesService } from './movies.service';
 export declare class UsersService {
     private userRepository;
     private authService;
     private emailService;
-    constructor(userRepository: UsersRepository, authService: AuthService, emailService: EmailService);
+    private movieService;
+    private reminderRepository;
+    constructor(userRepository: UsersRepository, authService: AuthService, emailService: EmailService, movieService: MoviesService, reminderRepository: ReminderRepository);
     private generateUserId;
     private generateRandomToken;
     private generateRandomPassword;
@@ -40,4 +44,7 @@ export declare class UsersService {
         message: string;
         data: import("./schemas/user.schema").UserDocument;
     }>;
+    setReminder(userId: string, movieId: number, reminderTime: string): Promise<any>;
+    getNotifications(userId: string): Promise<any>;
+    sendReminderNotifications(): Promise<void>;
 }

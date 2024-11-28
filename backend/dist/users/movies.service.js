@@ -14,6 +14,7 @@ const common_1 = require("@nestjs/common");
 const axios_1 = require("axios");
 const config_1 = require("@nestjs/config");
 const history_repository_1 = require("./repositories/history.repository");
+const user_type_1 = require("./types/user.type");
 let MoviesService = class MoviesService {
     constructor(configService, historyRepository) {
         this.configService = configService;
@@ -191,6 +192,34 @@ let MoviesService = class MoviesService {
             }
         }
         return streakCount;
+    }
+    async getMoviesByMood(genre) {
+        const genreValues = Object.values(user_type_1.MovieGenre);
+        if (!genreValues.includes(genre)) {
+            throw new common_1.HttpException(`Invalid genre. Supported genres are: ${genreValues.join(', ')}`, common_1.HttpStatus.BAD_REQUEST);
+        }
+        const selectedGenre = genre;
+        const genreMap = {
+            [user_type_1.MovieGenre.ACTION]: 28,
+            [user_type_1.MovieGenre.COMEDY]: 35,
+            [user_type_1.MovieGenre.DRAMA]: 18,
+            [user_type_1.MovieGenre.HORROR]: 27,
+            [user_type_1.MovieGenre.ROMANCE]: 10749,
+            [user_type_1.MovieGenre.SCIENCE_FICTION]: 878,
+            [user_type_1.MovieGenre.FANTASY]: 14,
+            [user_type_1.MovieGenre.THRILLER]: 53,
+            [user_type_1.MovieGenre.ANIMATION]: 16,
+            [user_type_1.MovieGenre.MYSTERY]: 9648,
+        };
+        const genreId = genreMap[selectedGenre];
+        const moviesResponse = await axios_1.default.get(`${this.tmdbBaseUrl}/discover/movie`, {
+            params: {
+                api_key: this.tmdbApiKey,
+                with_genres: genreId,
+                sort_by: 'popularity.desc',
+            },
+        });
+        return moviesResponse.data.results;
     }
     async getPopularMovies(page) {
         try {

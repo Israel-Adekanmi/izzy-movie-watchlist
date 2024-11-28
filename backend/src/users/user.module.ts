@@ -18,6 +18,8 @@ import {
 import { History, HistorySchema } from './schemas/history.schema';
 import { HistoryRepository } from './repositories/history.repository';
 import { EmailService } from 'src/common/email/email.service';
+import { Reminder, ReminderSchema } from './schemas/reminder.schema';
+import { ReminderRepository } from './repositories/reminder.repository';
 
 @Module({
   imports: [
@@ -37,6 +39,12 @@ import { EmailService } from 'src/common/email/email.service';
         schema: HistorySchema,
       },
     ]),
+    MongooseModule.forFeature([
+      {
+        name: Reminder.name,
+        schema: ReminderSchema,
+      },
+    ]),
     AuthModule,
   ],
   controllers: [UsersController],
@@ -46,6 +54,7 @@ import { EmailService } from 'src/common/email/email.service';
     EmailService,
     WatchlistRepository,
     HistoryRepository,
+    ReminderRepository,
     WatchlistService,
     UsersRepository,
     JwtService,

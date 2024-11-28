@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateTokenDto = exports.ForgotPassDto = exports.tokenDto = exports.LoginDto = exports.UpdateProfile = exports.CreateUserDto = void 0;
+exports.UpdateTokenDto = exports.ForgotPassDto = exports.tokenDto = exports.LoginDto = exports.UpdateProfile = exports.SetReminderDto = exports.CreateUserDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 const user_type_1 = require("../types/user.type");
@@ -48,6 +48,21 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "confirmPassword", void 0);
+class SetReminderDto {
+}
+exports.SetReminderDto = SetReminderDto;
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Number)
+], SetReminderDto.prototype, "movieId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], SetReminderDto.prototype, "reminderTime", void 0);
 class UpdateProfile {
 }
 exports.UpdateProfile = UpdateProfile;

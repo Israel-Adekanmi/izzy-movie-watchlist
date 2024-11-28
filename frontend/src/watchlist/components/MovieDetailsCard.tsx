@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { MovieDetailsCardProps } from "../type";
 import Toast from "./toast"; // Import Toast component
 import WatchlistPopup from "./WatchlistPopup";
+import SetReminderPopup from "./SetReminderPopup";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -21,6 +22,7 @@ const MovieDetailsCard: React.FC<MovieDetailsCardProps> = ({
   id,
 }) => {
   const [showPopup, setShowPopup] = useState(false);
+  const [showReminderPopup, setShowReminderPopup] = useState(false);
   const [watchlists, setWatchlists] = useState<any[]>([]);
   const [feedback, setFeedback] = useState<{
     type: "error" | "success";
@@ -76,6 +78,10 @@ const MovieDetailsCard: React.FC<MovieDetailsCardProps> = ({
       setShowPopup(false);
     }
   };
+
+  const handleSetReminder = async () => {
+    setShowReminderPopup(true)
+  }
 
   const handleMarkAsWatched = async () => {
     try {
@@ -173,6 +179,12 @@ const MovieDetailsCard: React.FC<MovieDetailsCardProps> = ({
             >
               Mark as Watched
             </button>
+            <button
+              onClick={handleSetReminder}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
+              Set Reminder
+            </button>
           </div>
         </div>
       </div>
@@ -189,6 +201,13 @@ const MovieDetailsCard: React.FC<MovieDetailsCardProps> = ({
           watchlists={watchlists}
           onSelect={handleAddToWatchlist}
           onClose={() => setShowPopup(false)}
+        />
+      )}
+      {showReminderPopup && (
+        <SetReminderPopup
+          movieId={id}
+          movieTitle={title}
+          onClose={() => setShowReminderPopup(false)}
         />
       )}
     </article>

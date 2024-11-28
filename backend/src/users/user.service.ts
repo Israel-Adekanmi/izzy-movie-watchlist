@@ -4,6 +4,8 @@ import * as bcrypt from 'bcryptjs';
 import { CreateUserDto, tokenDto, UpdateProfile } from './dto/create-user.dto';
 import { AuthService } from '../auth/auth.service';
 import { EmailService } from 'src/common/email/email.service';
+import { ReminderRepository } from './repositories/reminder.repository';
+import { MoviesService } from './movies.service';
 
 @Injectable()
 export class UsersService {
@@ -11,6 +13,8 @@ export class UsersService {
     private userRepository: UsersRepository,
     private authService: AuthService,
     private emailService: EmailService,
+    private movieService: MoviesService,
+    private reminderRepository: ReminderRepository,
   ) {}
 
   private generateUserId(): string {
@@ -407,6 +411,87 @@ export class UsersService {
         message: `Error updating profile ${error.message}`,
         data: null,
       };
+    }
+  }
+
+  async setReminder(
+    userId: string,
+    movieId: number,
+    reminderTime: string,
+  ): Promise<any> {
+    try {
+      const movie = await this.movieService.getMovieDetails(movieId);
+
+      const user = await this.userRepository.findUserById(userId);
+      // Convert reminderTime to a Date object
+      const reminderDate = new Date(reminderTime);
+
+      if (isNaN(reminderDate.getTime())) {
+        return {
+          error: true,
+          message: 'Invalid reminder time format',
+          data: null,
+        };
+      }
+
+      const reminderData = {
+        userId: userId,
+        movieId: movieId,
+        movieTitle: movie.title,
+        email: user.email,
+        reminderTime: reminderDate,
+        isSent: false,
+      };
+
+      // Save the reminder
+      const reminder =
+        await this.reminderRepository.createReminder(reminderData);
+
+      return {
+        error: false,
+        message: 'Reminder set successfully',
+        data: reminder,
+      };
+    } catch (error) {
+      console.error('Error setting reminder:', error);
+      return {
+        error: true,
+        message: `Error setting reminder: ${error.message}`,
+        data: null,
+      };
+    }
+  }
+
+  async getNotifications(userId: string): Promise<any> {
+    const reminders = await this.reminderRepository.findUserReminders(userId);
+
+    return {
+      error: false,
+      message: 'Reminder retrieved',
+      data: reminders,
+    };
+  }
+
+  async sendReminderNotifications() {
+    const currentTime = new Date();
+    const pendingReminders =
+      await this.reminderRepository.findPendingReminders(currentTime);
+
+    for (const reminder of pendingReminders) {
+      try {
+        // Send email
+        await this.emailService.sendReminder(
+          reminder.email,
+          reminder.movieTitle,
+          reminder.reminderTime.toLocaleString(),
+        );
+
+        // Mark reminder as sent
+        await this.reminderRepository.markReminderAsSent(reminder.id);
+        console.log(`Reminder sent for movie: ${reminder.movieTitle}`);
+      } catch (error) {
+        console.error('Error sending reminder:', error);
+      }
     }
   }
 }

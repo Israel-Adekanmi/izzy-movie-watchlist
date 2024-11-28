@@ -1,5 +1,5 @@
 import { UsersService } from './user.service';
-import { CreateUserDto, ForgotPassDto, LoginDto, tokenDto, UpdateProfile } from './dto/create-user.dto';
+import { CreateUserDto, ForgotPassDto, LoginDto, SetReminderDto, tokenDto, UpdateProfile } from './dto/create-user.dto';
 import { MoviesService } from './movies.service';
 import { WatchlistService } from './watchlist.service';
 import { AddMovieDto, CreateWatchlistDto, EditWatchlistDto, RemoveMovieDto } from './dto/watchlist.dto';
@@ -61,6 +61,7 @@ export declare class UsersController {
     getTrendingMovies(page: number): Promise<any>;
     getGenres(): Promise<any>;
     getRecommendations(id: number, page: number): Promise<any>;
+    fetchMoviesByMood(genre: string): Promise<any>;
     searchPeople(query: string, page: number): Promise<any>;
     getVideos(id: number): Promise<any>;
     getImages(id: number): Promise<any>;
@@ -99,4 +100,6 @@ export declare class UsersController {
         message: string;
         data: any;
     }>;
+    setReminder(req: any, setReminderData: SetReminderDto): Promise<any>;
+    getUserReminders(req: any): Promise<any>;
 }

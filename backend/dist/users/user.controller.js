@@ -83,6 +83,9 @@ let UsersController = class UsersController {
     async getRecommendations(id, page) {
         return await this.moviesService.getRecommendations(id, page);
     }
+    async fetchMoviesByMood(genre) {
+        return await this.moviesService.getMoviesByMood(genre);
+    }
     async searchPeople(query, page) {
         if (!query) {
             return { error: true, message: 'Query parameter is required' };
@@ -119,6 +122,12 @@ let UsersController = class UsersController {
     }
     async deleteWatchlist(watchlistId) {
         return await this.watchlistService.deleteWatchlistById(watchlistId);
+    }
+    async setReminder(req, setReminderData) {
+        return await this.usersService.setReminder(req.user.userId, setReminderData.movieId, setReminderData.reminderTime);
+    }
+    async getUserReminders(req) {
+        return await this.usersService.getNotifications(req.user.userId);
     }
 };
 exports.UsersController = UsersController;
@@ -323,6 +332,18 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getRecommendations", null);
 __decorate([
+    (0, common_1.Get)('get-by-mood'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.AuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({
+        description: 'Get movies based on user mood',
+    }),
+    __param(0, (0, common_1.Query)('genre')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "fetchMoviesByMood", null);
+__decorate([
     (0, common_1.Get)('people/search'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({
@@ -441,6 +462,31 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "deleteWatchlist", null);
+__decorate([
+    (0, common_1.Post)('set-reminder'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.AuthGuard),
+    (0, swagger_1.ApiOperation)({
+        description: 'Set reminder for movie',
+    }),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, create_user_dto_1.SetReminderDto]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "setReminder", null);
+__decorate([
+    (0, common_1.Get)('get-reminders'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.AuthGuard),
+    (0, swagger_1.ApiOperation)({
+        description: 'Get User Reminders',
+    }),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "getUserReminders", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UsersService,

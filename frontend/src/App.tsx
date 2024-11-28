@@ -11,6 +11,8 @@ import WatchlistDetails from './watchlist/pages/WatchlistDetails';
 import ProtectedRoute from './context/ProtectedRoute';
 import VerifyEmailPage from './watchlist/pages/VerifyEmail';
 import HistoryPage from './watchlist/pages/HistoryPage';
+import ReminderPage from './watchlist/pages/ReminderPage';
+import MoodRecommendationPage from './watchlist/pages/MoodSearch';
 
 function App() {
   return (
@@ -49,6 +51,22 @@ function App() {
           element={
             <ProtectedRoute>
               <MovieDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+         <Route
+          path="/reminders"
+          element={
+            <ProtectedRoute>
+              <ReminderPage />
+            </ProtectedRoute>
+          }
+        />
+         <Route
+          path="/mood-recommendation"
+          element={
+            <ProtectedRoute>
+              <MoodRecommendationPage />
             </ProtectedRoute>
           }
         />

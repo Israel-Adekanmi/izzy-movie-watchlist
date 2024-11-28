@@ -7,6 +7,10 @@ export declare class CreateUserDto {
     password: string;
     confirmPassword: string;
 }
+export declare class SetReminderDto {
+    movieId: number;
+    reminderTime: string;
+}
 export declare class UpdateProfile {
     firstName: string;
     lastName: string;

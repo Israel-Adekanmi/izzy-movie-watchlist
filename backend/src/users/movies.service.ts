@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { HistoryRepository } from './repositories/history.repository';
+import { MovieGenre } from './types/user.type';
 
 @Injectable()
 export class MoviesService {
@@ -223,6 +224,50 @@ export class MoviesService {
     }
 
     return streakCount;
+  }
+
+  async getMoviesByMood(genre: string): Promise<any> {
+    const genreValues = Object.values(MovieGenre);
+
+    // Validate genre input
+    if (!genreValues.includes(genre as MovieGenre)) {
+      throw new HttpException(
+        `Invalid genre. Supported genres are: ${genreValues.join(', ')}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    // Map genre string to the enum
+    const selectedGenre: MovieGenre = genre as MovieGenre;
+
+    const genreMap = {
+      [MovieGenre.ACTION]: 28,
+      [MovieGenre.COMEDY]: 35,
+      [MovieGenre.DRAMA]: 18,
+      [MovieGenre.HORROR]: 27,
+      [MovieGenre.ROMANCE]: 10749,
+      [MovieGenre.SCIENCE_FICTION]: 878,
+      [MovieGenre.FANTASY]: 14,
+      [MovieGenre.THRILLER]: 53,
+      [MovieGenre.ANIMATION]: 16,
+      [MovieGenre.MYSTERY]: 9648,
+    };
+
+    const genreId = genreMap[selectedGenre];
+
+    // Fetch movies by genre ID
+    const moviesResponse = await axios.get(
+      `${this.tmdbBaseUrl}/discover/movie`,
+      {
+        params: {
+          api_key: this.tmdbApiKey,
+          with_genres: genreId,
+          sort_by: 'popularity.desc',
+        },
+      },
+    );
+
+    return moviesResponse.data.results;
   }
 
   // Fetch popular movies

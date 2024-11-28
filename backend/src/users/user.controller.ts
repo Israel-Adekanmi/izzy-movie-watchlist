@@ -15,6 +15,7 @@ import {
   CreateUserDto,
   ForgotPassDto,
   LoginDto,
+  SetReminderDto,
   tokenDto,
   UpdateProfile,
 } from './dto/create-user.dto';
@@ -237,6 +238,16 @@ export class UsersController {
     return await this.moviesService.getRecommendations(id, page);
   }
 
+  @Get('get-by-mood')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    description: 'Get movies based on user mood',
+  })
+  async fetchMoviesByMood(@Query('genre') genre: string) {
+    return await this.moviesService.getMoviesByMood(genre);
+  }
+
   // Search for people with pagination
   @Get('people/search')
   @ApiBearerAuth()
@@ -363,5 +374,32 @@ export class UsersController {
   })
   async deleteWatchlist(@Param('watchlistId') watchlistId: string) {
     return await this.watchlistService.deleteWatchlistById(watchlistId);
+  }
+
+  @Post('set-reminder')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @ApiOperation({
+    description: 'Set reminder for movie',
+  })
+  async setReminder(
+    @Request() req: any,
+    @Body() setReminderData: SetReminderDto,
+  ) {
+    return await this.usersService.setReminder(
+      req.user.userId,
+      setReminderData.movieId,
+      setReminderData.reminderTime,
+    );
+  }
+
+  @Get('get-reminders')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @ApiOperation({
+    description: 'Get User Reminders',
+  })
+  async getUserReminders(@Request() req: any) {
+    return await this.usersService.getNotifications(req.user.userId);
   }
 }

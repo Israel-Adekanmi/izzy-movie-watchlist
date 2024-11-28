@@ -25,6 +25,7 @@ export declare class MoviesService {
         data: any;
     }>;
     calculateStreak(userId: string): Promise<number>;
+    getMoviesByMood(genre: string): Promise<any>;
     getPopularMovies(page: number): Promise<any>;
     getTopRatedMovies(page: number): Promise<any>;
     getTrendingMovies(page: number): Promise<any>;

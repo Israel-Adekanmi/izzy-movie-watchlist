@@ -117,7 +117,7 @@ const Sidebar: React.FC = () => {
   return (
     <aside className="flex flex-col w-[19%] max-md:ml-0 max-md:w-full">
       <nav className="flex flex-col items-start self-stretch my-auto h-full w-full text-base text-center text-neutral-200 max-md:mt-10">
-        <h1 className="ml-3 text-3xl font-extrabold text-red-500 max-md:ml-2.5">
+        <h1 className="pt-4 ml-3 text-3xl font-extrabold text-red-500 max-md:ml-2.5">
           IzzyWatch
         </h1>
 
@@ -142,7 +142,14 @@ const Sidebar: React.FC = () => {
           </div>
         )}
 
-        <div className="flex gap-4 ml-4 px-3 py-2 mt-5 whitespace-nowrap rounded-md border border-solid border-zinc-300 border-opacity-30 text-zinc-300 text-opacity-30">
+        <button
+          onClick={() => navigate("/mood-recommendation")}
+          className={`flex gap-4 ml-4 px-3 py-2 mt-5 whitespace-nowrap rounded-md border border-solid border-zinc-300 border-opacity-30 text-zinc-300 text-opacity-30 ${
+            location.pathname === "/mood-recommendation"
+              ? "bg-red-500"
+              : "bg-black"
+          }`}
+        >
           <img
             loading="lazy"
             src="https://cdn.builder.io/api/v1/image/assets/TEMP/de49f6323d6fb4c6fbb22968e591fe227c08c9dda743b9ab51bf71068490937d?placeholderIfAbsent=true&apiKey=f5b8ba5475bd498da429e6b069b7e677"
@@ -150,7 +157,7 @@ const Sidebar: React.FC = () => {
             className="object-contain shrink-0 aspect-square w-[21px]"
           />
           <span className="basis-auto">Search</span>
-        </div>
+        </button>
 
         <button
           onClick={() => navigate("/")}
@@ -180,6 +187,21 @@ const Sidebar: React.FC = () => {
             className="object-contain shrink-0 aspect-[1.05] w-[22px]"
           />
           <span className="basis-auto">History</span>
+        </button>
+
+        <button
+          onClick={() => navigate("/reminders")}
+          className={`flex gap-4 md w-[88%] px-3 py-2.5 mt-5 whitespace-nowrap rounded-md ml-4 text-left focus:outline-none focus:ring-2 ${
+            location.pathname === "/reminders" ? "bg-red-500" : "bg-black"
+          }`}
+        >
+          <img
+            loading="lazy"
+            src="https://i.ibb.co/DPFSRWd/image-removebg-preview-1.png"
+            alt=""
+            className="object-contain shrink-0 aspect-[1.05] w-[22px]"
+          />
+          <span className="basis-auto">Reminders</span>
         </button>
 
         <button

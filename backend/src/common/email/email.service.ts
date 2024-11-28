@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { verifyEmailTemplate } from './templates/email-verification.template';
 import { forgotPasswordTemplate } from './templates/forgot-password.template';
+import { reminderTemplate } from './templates/reminder.template';
 
 @Injectable()
 export class EmailService {
@@ -58,6 +59,22 @@ export class EmailService {
       const takeThis = await this.transporter.sendMail(mailOptions);
       return takeThis;
       // console.log()
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async sendReminder(email: string, movieTitle: string, reminderTime: string) {
+    // Generate mail options
+    try {
+      const mailOptions = this.generateMailOptions(
+        email,
+        `Reminder: Watch ${movieTitle}`,
+        reminderTemplate(email, movieTitle, reminderTime).html,
+      );
+
+      // Send the email
+      await this.transporter.sendMail(mailOptions);
     } catch (error) {
       console.log(error);
     }

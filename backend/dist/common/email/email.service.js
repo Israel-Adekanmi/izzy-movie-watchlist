@@ -14,6 +14,7 @@ const common_1 = require("@nestjs/common");
 const nodemailer = require("nodemailer");
 const email_verification_template_1 = require("./templates/email-verification.template");
 const forgot_password_template_1 = require("./templates/forgot-password.template");
+const reminder_template_1 = require("./templates/reminder.template");
 let EmailService = class EmailService {
     constructor() {
         this.transporter = nodemailer.createTransport({
@@ -48,6 +49,15 @@ let EmailService = class EmailService {
             const mailOptions = this.generateMailOptions(email, 'Reset Password', (0, forgot_password_template_1.forgotPasswordTemplate)(email, resetPassword).html);
             const takeThis = await this.transporter.sendMail(mailOptions);
             return takeThis;
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+    async sendReminder(email, movieTitle, reminderTime) {
+        try {
+            const mailOptions = this.generateMailOptions(email, `Reminder: Watch ${movieTitle}`, (0, reminder_template_1.reminderTemplate)(email, movieTitle, reminderTime).html);
+            await this.transporter.sendMail(mailOptions);
         }
         catch (error) {
             console.log(error);

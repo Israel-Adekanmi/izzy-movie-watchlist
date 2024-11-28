@@ -15,11 +15,15 @@ const user_repository_1 = require("./repositories/user.repository");
 const bcrypt = require("bcryptjs");
 const auth_service_1 = require("../auth/auth.service");
 const email_service_1 = require("../common/email/email.service");
+const reminder_repository_1 = require("./repositories/reminder.repository");
+const movies_service_1 = require("./movies.service");
 let UsersService = class UsersService {
-    constructor(userRepository, authService, emailService) {
+    constructor(userRepository, authService, emailService, movieService, reminderRepository) {
         this.userRepository = userRepository;
         this.authService = authService;
         this.emailService = emailService;
+        this.movieService = movieService;
+        this.reminderRepository = reminderRepository;
     }
     generateUserId() {
         const length = 24;
@@ -303,12 +307,72 @@ let UsersService = class UsersService {
             };
         }
     }
+    async setReminder(userId, movieId, reminderTime) {
+        try {
+            const movie = await this.movieService.getMovieDetails(movieId);
+            const user = await this.userRepository.findUserById(userId);
+            const reminderDate = new Date(reminderTime);
+            if (isNaN(reminderDate.getTime())) {
+                return {
+                    error: true,
+                    message: 'Invalid reminder time format',
+                    data: null,
+                };
+            }
+            const reminderData = {
+                userId: userId,
+                movieId: movieId,
+                movieTitle: movie.title,
+                email: user.email,
+                reminderTime: reminderDate,
+                isSent: false,
+            };
+            const reminder = await this.reminderRepository.createReminder(reminderData);
+            return {
+                error: false,
+                message: 'Reminder set successfully',
+                data: reminder,
+            };
+        }
+        catch (error) {
+            console.error('Error setting reminder:', error);
+            return {
+                error: true,
+                message: `Error setting reminder: ${error.message}`,
+                data: null,
+            };
+        }
+    }
+    async getNotifications(userId) {
+        const reminders = await this.reminderRepository.findUserReminders(userId);
+        return {
+            error: false,
+            message: 'Reminder retrieved',
+            data: reminders,
+        };
+    }
+    async sendReminderNotifications() {
+        const currentTime = new Date();
+        const pendingReminders = await this.reminderRepository.findPendingReminders(currentTime);
+        for (const reminder of pendingReminders) {
+            try {
+                await this.emailService.sendReminder(reminder.email, reminder.movieTitle, reminder.reminderTime.toLocaleString());
+                await this.reminderRepository.markReminderAsSent(reminder.id);
+                console.log(`Reminder sent for movie: ${reminder.movieTitle}`);
+            }
+            catch (error) {
+                console.error('Error sending reminder:', error);
+            }
+        }
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [user_repository_1.UsersRepository,
         auth_service_1.AuthService,
-        email_service_1.EmailService])
+        email_service_1.EmailService,
+        movies_service_1.MoviesService,
+        reminder_repository_1.ReminderRepository])
 ], UsersService);
 //# sourceMappingURL=user.service.js.map

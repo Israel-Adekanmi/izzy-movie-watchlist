@@ -1,5 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsString, IsNotEmpty, IsEnum, IsDate } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  IsNotEmpty,
+  IsEnum,
+  IsDate,
+  IsNumber,
+} from 'class-validator';
 import { Gender } from '../types/user.type';
 
 export class CreateUserDto {
@@ -28,6 +35,18 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   confirmPassword: string;
+}
+
+export class SetReminderDto {
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  movieId: number;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  reminderTime: string;
 }
 
 export class UpdateProfile {

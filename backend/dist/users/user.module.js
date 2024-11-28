@@ -24,6 +24,8 @@ const token_schema_1 = require("./schemas/token.schema");
 const history_schema_1 = require("./schemas/history.schema");
 const history_repository_1 = require("./repositories/history.repository");
 const email_service_1 = require("../common/email/email.service");
+const reminder_schema_1 = require("./schemas/reminder.schema");
+const reminder_repository_1 = require("./repositories/reminder.repository");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
@@ -46,6 +48,12 @@ exports.UsersModule = UsersModule = __decorate([
                     schema: history_schema_1.HistorySchema,
                 },
             ]),
+            mongoose_1.MongooseModule.forFeature([
+                {
+                    name: reminder_schema_1.Reminder.name,
+                    schema: reminder_schema_1.ReminderSchema,
+                },
+            ]),
             auth_module_1.AuthModule,
         ],
         controllers: [user_controller_1.UsersController],
@@ -55,6 +63,7 @@ exports.UsersModule = UsersModule = __decorate([
             email_service_1.EmailService,
             watchlist_repository_1.WatchlistRepository,
             history_repository_1.HistoryRepository,
+            reminder_repository_1.ReminderRepository,
             watchlist_service_1.WatchlistService,
             user_repository_1.UsersRepository,
             jwt_1.JwtService,
