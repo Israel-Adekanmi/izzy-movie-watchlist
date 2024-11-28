@@ -32,16 +32,16 @@ export class AuthService {
         return invalidPasswordResponse;
       }
 
-      //Check if the user email has been verified, that is completed sign up
-      //   if (user.isEmailVerified === false) {
-      //     const emailNotVerifiedRes = {
-      //       error: true,
-      //       message:
-      //         'Email has not been verified, check your email for verification token to proceed to login',
-      //       data: null,
-      //     };
-      //     return emailNotVerifiedRes;
-      //   }
+      //   Check if the user email has been verified, that is completed sign up
+      if (user.isEmailVerified === false) {
+        const emailNotVerifiedRes = {
+          error: true,
+          message:
+            'Email has not been verified, check your email for verification token to proceed to login',
+          data: null,
+        };
+        return emailNotVerifiedRes;
+      }
 
       const payload = { userId: user.userId, email: user.email };
 

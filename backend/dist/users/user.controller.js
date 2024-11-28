@@ -30,9 +30,16 @@ let UsersController = class UsersController {
     async signup(createUser) {
         return await this.usersService.create(createUser);
     }
+    async verifyUserEmail(tokenData) {
+        return await this.usersService.verifyUserEmail(tokenData);
+    }
     async login(loginDto) {
         const loginData = await this.usersService.userLogIn(loginDto.email, loginDto.password);
         return loginData;
+    }
+    async userForgotPassword(emailPass) {
+        const forgotPass = await this.usersService.userForgotPassword(emailPass.email);
+        return forgotPass;
     }
     async getProfile(req) {
         return await this.usersService.getUserProfile(req.user.userId);
@@ -48,6 +55,18 @@ let UsersController = class UsersController {
     }
     async getMovieDetails(id) {
         return await this.moviesService.getMovieDetails(id);
+    }
+    async markMovie(id, req) {
+        return await this.moviesService.markMovieWatched(id, req.user.userId);
+    }
+    async getHistory(req) {
+        return await this.moviesService.getHistory(req.user.userId);
+    }
+    async deleteHistory(req) {
+        return await this.moviesService.deleteHistory(req.user.userId);
+    }
+    async getCurrentStreak(req) {
+        return await this.moviesService.calculateStreak(req.user.userId);
     }
     async getPopularMovies(page) {
         return await this.moviesService.getPopularMovies(page);
@@ -98,6 +117,9 @@ let UsersController = class UsersController {
     async getWatchlistById(id) {
         return await this.watchlistService.getWatchlistById(id);
     }
+    async deleteWatchlist(watchlistId) {
+        return await this.watchlistService.deleteWatchlistById(watchlistId);
+    }
 };
 exports.UsersController = UsersController;
 __decorate([
@@ -112,6 +134,18 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "signup", null);
 __decorate([
+    (0, common_1.Post)('/verify-email'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(),
+    (0, swagger_1.ApiOperation)({
+        description: 'Verify user email',
+    }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_user_dto_1.tokenDto]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "verifyUserEmail", null);
+__decorate([
     (0, common_1.Post)('login'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({
@@ -122,6 +156,18 @@ __decorate([
     __metadata("design:paramtypes", [create_user_dto_1.LoginDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "login", null);
+__decorate([
+    (0, common_1.Post)('forgot-password'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(),
+    (0, swagger_1.ApiOperation)({
+        description: 'User forgot password, send reset email',
+    }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_user_dto_1.ForgotPassDto]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "userForgotPassword", null);
 __decorate([
     (0, common_1.Get)('get-profile'),
     (0, swagger_1.ApiBearerAuth)(),
@@ -171,6 +217,55 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getMovieDetails", null);
+__decorate([
+    (0, common_1.Post)('mark-watched/:id'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.AuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({
+        description: 'Mark a movie as watched by ID',
+    }),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "markMovie", null);
+__decorate([
+    (0, common_1.Get)('get-movie-history'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.AuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({
+        description: 'Get user movie history',
+    }),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "getHistory", null);
+__decorate([
+    (0, common_1.Delete)('delete-history'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.AuthGuard),
+    (0, swagger_1.ApiOperation)({
+        description: 'Delete History',
+    }),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "deleteHistory", null);
+__decorate([
+    (0, common_1.Get)('get-current-streak'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.AuthGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiOperation)({
+        description: 'Get user current streak',
+    }),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "getCurrentStreak", null);
 __decorate([
     (0, common_1.Get)('popular'),
     (0, swagger_1.ApiBearerAuth)(),
@@ -334,6 +429,18 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getWatchlistById", null);
+__decorate([
+    (0, common_1.Delete)('delete-watchlist/:watchlistId'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.AuthGuard),
+    (0, swagger_1.ApiOperation)({
+        description: 'Delete Watchlist',
+    }),
+    __param(0, (0, common_1.Param)('watchlistId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "deleteWatchlist", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UsersService,

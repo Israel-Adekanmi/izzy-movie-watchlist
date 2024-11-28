@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LoginDto = exports.UpdateProfile = exports.CreateUserDto = void 0;
+exports.UpdateTokenDto = exports.ForgotPassDto = exports.tokenDto = exports.LoginDto = exports.UpdateProfile = exports.CreateUserDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 const user_type_1 = require("../types/user.type");
@@ -86,4 +86,38 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], LoginDto.prototype, "password", void 0);
+class tokenDto {
+}
+exports.tokenDto = tokenDto;
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], tokenDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], tokenDto.prototype, "token", void 0);
+class ForgotPassDto {
+}
+exports.ForgotPassDto = ForgotPassDto;
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], ForgotPassDto.prototype, "email", void 0);
+class UpdateTokenDto {
+}
+exports.UpdateTokenDto = UpdateTokenDto;
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], UpdateTokenDto.prototype, "token", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)(),
+    (0, class_validator_1.IsDate)(),
+    __metadata("design:type", Date)
+], UpdateTokenDto.prototype, "updatedAt", void 0);
 //# sourceMappingURL=create-user.dto.js.map

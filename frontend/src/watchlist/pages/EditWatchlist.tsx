@@ -137,6 +137,38 @@ const EditWatchlist: React.FC = () => {
     }
   };
 
+  // Handle deleting the watchlist
+  const handleDeleteWatchlist = async () => {
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${BASE_URL}/delete-watchlist/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+
+      if (data.error) {
+        setFeedback({ type: "error", message: data.message });
+      } else {
+        setFeedback({
+          type: "success",
+          message: "Watchlist deleted successfully!",
+        });
+        setTimeout(() => navigate('/'), 1500); // Redirect to home after success
+      }
+    } catch (err: any) {
+      setFeedback({
+        type: "error",
+        message: err.message || "Failed to delete watchlist",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
 
   return (
@@ -159,7 +191,7 @@ const EditWatchlist: React.FC = () => {
           <div className="flex flex-col py-9 pr-16 pl-8 mx-auto w-full bg-white bg-opacity-10 max-md:px-5 max-md:mt-10 max-md:max-w-full">
             <div className="flex flex-wrap gap-5 justify-between max-md:max-w-full">
               <h2 className="text-3xl text-neutral-200">Edit your Watchlist</h2>
-              <button className="my-auto text-base font-bold text-center text-red-500">
+              <button className="my-auto text-base font-bold text-center text-red-500" onClick={handleDeleteWatchlist}>
                 Delete Watchlist
               </button>
             </div>

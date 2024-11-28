@@ -11,6 +11,13 @@ import { MoviesService } from './movies.service';
 import { Watchlist, WatchlistSchema } from './schemas/watchlist.schema';
 import { WatchlistRepository } from './repositories/watchlist.repository';
 import { WatchlistService } from './watchlist.service';
+import {
+  EmailVerificationToken,
+  EmailVerificationTokenSchema,
+} from './schemas/token.schema';
+import { History, HistorySchema } from './schemas/history.schema';
+import { HistoryRepository } from './repositories/history.repository';
+import { EmailService } from 'src/common/email/email.service';
 
 @Module({
   imports: [
@@ -18,13 +25,27 @@ import { WatchlistService } from './watchlist.service';
     MongooseModule.forFeature([
       { name: Watchlist.name, schema: WatchlistSchema },
     ]),
+    MongooseModule.forFeature([
+      {
+        name: EmailVerificationToken.name,
+        schema: EmailVerificationTokenSchema,
+      },
+    ]),
+    MongooseModule.forFeature([
+      {
+        name: History.name,
+        schema: HistorySchema,
+      },
+    ]),
     AuthModule,
   ],
   controllers: [UsersController],
   providers: [
     UsersService,
     MoviesService,
+    EmailService,
     WatchlistRepository,
+    HistoryRepository,
     WatchlistService,
     UsersRepository,
     JwtService,

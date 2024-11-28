@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { useNavigate } from "react-router-dom";
 import Toast from "../components/toast";
+import ForgotPasswordModal from "../components/ForgotPasswordPopUp";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -15,6 +16,7 @@ const GuestLogin: React.FC = () => {
     type: "error" | "success";
     message: string;
   } | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -41,9 +43,9 @@ const GuestLogin: React.FC = () => {
       } else {
         setFeedback({ type: "success", message: "Login successful!" });
 
-       // Store the token in localStorage
-       localStorage.setItem("accessToken", data.data.accessToken);
-       localStorage.setItem("authUser", JSON.stringify(data.data.user));
+        // Store the token in localStorage
+        localStorage.setItem("accessToken", data.data.accessToken);
+        localStorage.setItem("authUser", JSON.stringify(data.data.user));
 
         // Redirect to the homepage
         setTimeout(() => navigate("/"), 1500);
@@ -57,7 +59,7 @@ const GuestLogin: React.FC = () => {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="flex flex-col bg-black text-white">
       <div className="flex gap-5 max-md:flex-col">
@@ -74,7 +76,7 @@ const GuestLogin: React.FC = () => {
               onClose={() => setFeedback(null)}
             />
           )}
-          
+
           <div className="mt-4 w-full max-w-md">
             <h1 className="text-3xl font-semibold mb-4">Hello!</h1>
             <p className="mb-6">
@@ -95,7 +97,7 @@ const GuestLogin: React.FC = () => {
                 <input
                   type="email"
                   id="email"
-                   value={formData.email}
+                  value={formData.email}
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-2 bg-black border border-gray-600 rounded-md text-white focus:ring-2 focus:ring-red-500"
@@ -120,7 +122,7 @@ const GuestLogin: React.FC = () => {
                 />
               </div>
 
-               {/* Submit Button */}
+              {/* Submit Button */}
               <button
                 type="submit"
                 className="w-full px-6 py-3 bg-red-500 text-black font-semibold rounded-md hover:bg-red-600 focus:ring-2 focus:ring-red-500"
@@ -132,13 +134,29 @@ const GuestLogin: React.FC = () => {
 
             <p className="mt-4 text-center">
               or{" "}
-              <a onClick={() => navigate("/signup")} className="text-red-500 hover:underline">
+              <a
+                onClick={() => navigate("/signup")}
+                className="text-red-500 hover:underline"
+              >
                 create an account
               </a>
+            </p>
+
+            {/* Forgot Password Link */}
+            <p className="mt-4 text-center">
+              <button
+                onClick={() => setShowModal(true)} // Show the modal when clicked
+                className="text-red-500 hover:underline"
+              >
+                Forgot Password?
+              </button>
             </p>
           </div>
         </main>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showModal && <ForgotPasswordModal onClose={() => setShowModal(false)} />}
     </div>
   );
 };

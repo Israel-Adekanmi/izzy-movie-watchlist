@@ -20,6 +20,10 @@ const movies_service_1 = require("./movies.service");
 const watchlist_schema_1 = require("./schemas/watchlist.schema");
 const watchlist_repository_1 = require("./repositories/watchlist.repository");
 const watchlist_service_1 = require("./watchlist.service");
+const token_schema_1 = require("./schemas/token.schema");
+const history_schema_1 = require("./schemas/history.schema");
+const history_repository_1 = require("./repositories/history.repository");
+const email_service_1 = require("../common/email/email.service");
 let UsersModule = class UsersModule {
 };
 exports.UsersModule = UsersModule;
@@ -30,13 +34,27 @@ exports.UsersModule = UsersModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: watchlist_schema_1.Watchlist.name, schema: watchlist_schema_1.WatchlistSchema },
             ]),
+            mongoose_1.MongooseModule.forFeature([
+                {
+                    name: token_schema_1.EmailVerificationToken.name,
+                    schema: token_schema_1.EmailVerificationTokenSchema,
+                },
+            ]),
+            mongoose_1.MongooseModule.forFeature([
+                {
+                    name: history_schema_1.History.name,
+                    schema: history_schema_1.HistorySchema,
+                },
+            ]),
             auth_module_1.AuthModule,
         ],
         controllers: [user_controller_1.UsersController],
         providers: [
             user_service_1.UsersService,
             movies_service_1.MoviesService,
+            email_service_1.EmailService,
             watchlist_repository_1.WatchlistRepository,
+            history_repository_1.HistoryRepository,
             watchlist_service_1.WatchlistService,
             user_repository_1.UsersRepository,
             jwt_1.JwtService,

@@ -35,4 +35,9 @@ export declare class WatchlistService {
         message: string;
         data: import("./schemas/watchlist.schema").WatchlistDocument;
     }>;
+    deleteWatchlistById(watchId: string): Promise<{
+        error: boolean;
+        message: string;
+        data: any;
+    }>;
 }

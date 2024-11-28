@@ -1,5 +1,5 @@
 import { UsersService } from './user.service';
-import { CreateUserDto, LoginDto, UpdateProfile } from './dto/create-user.dto';
+import { CreateUserDto, ForgotPassDto, LoginDto, tokenDto, UpdateProfile } from './dto/create-user.dto';
 import { MoviesService } from './movies.service';
 import { WatchlistService } from './watchlist.service';
 import { AddMovieDto, CreateWatchlistDto, EditWatchlistDto, RemoveMovieDto } from './dto/watchlist.dto';
@@ -13,7 +13,21 @@ export declare class UsersController {
         message: string;
         data: any;
     }>;
+    verifyUserEmail(tokenData: tokenDto): Promise<{
+        error: boolean;
+        message: string;
+        data: import("./schemas/user.schema").UserDocument;
+    }>;
     login(loginDto: LoginDto): Promise<any>;
+    userForgotPassword(emailPass: ForgotPassDto): Promise<{
+        error: boolean;
+        message: string;
+        data: any;
+    } | {
+        error: string;
+        message: any;
+        data?: undefined;
+    }>;
     getProfile(req: any): Promise<{
         error: boolean;
         message: string;
@@ -26,6 +40,22 @@ export declare class UsersController {
     }>;
     searchMovies(query: string, page: number): Promise<any>;
     getMovieDetails(id: number): Promise<any>;
+    markMovie(id: number, req: any): Promise<{
+        error: boolean;
+        message: string;
+        data: any;
+    }>;
+    getHistory(req: any): Promise<{
+        error: boolean;
+        message: string;
+        data: import("./schemas/history.schema").HistoryDocument;
+    }>;
+    deleteHistory(req: any): Promise<{
+        error: boolean;
+        message: string;
+        data: any;
+    }>;
+    getCurrentStreak(req: any): Promise<number>;
     getPopularMovies(page: number): Promise<any>;
     getTopRatedMovies(page: number): Promise<any>;
     getTrendingMovies(page: number): Promise<any>;
@@ -63,5 +93,10 @@ export declare class UsersController {
         error: boolean;
         message: string;
         data: import("./schemas/watchlist.schema").WatchlistDocument;
+    }>;
+    deleteWatchlist(watchlistId: string): Promise<{
+        error: boolean;
+        message: string;
+        data: any;
     }>;
 }

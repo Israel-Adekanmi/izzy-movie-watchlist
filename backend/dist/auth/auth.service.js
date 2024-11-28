@@ -31,6 +31,14 @@ let AuthService = class AuthService {
                 };
                 return invalidPasswordResponse;
             }
+            if (user.isEmailVerified === false) {
+                const emailNotVerifiedRes = {
+                    error: true,
+                    message: 'Email has not been verified, check your email for verification token to proceed to login',
+                    data: null,
+                };
+                return emailNotVerifiedRes;
+            }
             const payload = { userId: user.userId, email: user.email };
             try {
                 const accessToken = await this.jwtService.signAsync(payload, {

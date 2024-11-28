@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 // import Toast from "../components/toast";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [userFirstName, setUserFirstName] = useState<string | null>("");
   const [userWatchlists, setUserWatchlists] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -14,6 +15,7 @@ const Sidebar: React.FC = () => {
     type: "error" | "success";
     message: string;
   } | null>(null);
+  const [currentStreak, setCurrentStreak] = useState<number | null>(null);
 
   const token = localStorage.getItem("accessToken");
 
@@ -71,10 +73,32 @@ const Sidebar: React.FC = () => {
         setLoading(false);
       }
     };
+    // Fetch user current streak
+    const fetchCurrentStreak = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/get-current-streak`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        if (!data.error) {
+          setCurrentStreak(data); // Set the current streak value
+        } else {
+          setCurrentStreak(null); // Reset streak on error
+        }
+      } catch (err) {
+        console.error("Error fetching current streak:", err);
+        setCurrentStreak(null);
+      }
+    };
 
     if (token) {
       fetchUserProfile();
       fetchUserWatchlists();
+      fetchCurrentStreak(); // Fetch the current streak
     }
   }, [token]);
 
@@ -88,6 +112,7 @@ const Sidebar: React.FC = () => {
   const handleWatchlistClick = (watchlistId: string) => {
     navigate(`/watchlist-details/${watchlistId}`);
   };
+  //   console.log('current streak: ', currentStreak)
 
   return (
     <aside className="flex flex-col w-[19%] max-md:ml-0 max-md:w-full">
@@ -95,6 +120,16 @@ const Sidebar: React.FC = () => {
         <h1 className="ml-3 text-3xl font-extrabold text-red-500 max-md:ml-2.5">
           IzzyWatch
         </h1>
+
+        {/* Current Streak Display */}
+        {currentStreak !== null && (
+          <div className=" ml-3 px-4 mt-5 py-4 bg-red-500 rounded-xl text-white">
+            <span className="font-semibold text-2xl">
+              Current Streak: <br />
+              <span className="text-black font-bold">{currentStreak}</span>
+            </span>
+          </div>
+        )}
 
         {/* Feedback Message */}
         {feedback && (
@@ -107,7 +142,7 @@ const Sidebar: React.FC = () => {
           </div>
         )}
 
-        <div className="flex gap-4 px-3 py-2 mt-5 whitespace-nowrap rounded-md border border-solid border-zinc-300 border-opacity-30 text-zinc-300 text-opacity-30">
+        <div className="flex gap-4 ml-4 px-3 py-2 mt-5 whitespace-nowrap rounded-md border border-solid border-zinc-300 border-opacity-30 text-zinc-300 text-opacity-30">
           <img
             loading="lazy"
             src="https://cdn.builder.io/api/v1/image/assets/TEMP/de49f6323d6fb4c6fbb22968e591fe227c08c9dda743b9ab51bf71068490937d?placeholderIfAbsent=true&apiKey=f5b8ba5475bd498da429e6b069b7e677"
@@ -119,7 +154,9 @@ const Sidebar: React.FC = () => {
 
         <button
           onClick={() => navigate("/")}
-          className="flex gap-3.5 px-3 py-2.5 mt-10 whitespace-nowrap rounded-md bg-stone-900 w-full text-left focus:outline-none focus:ring-2 focus:ring-red-500"
+          className={`flex gap-3.5 px-3 py-2.5 mt-10 whitespace-nowrap ml-4 rounded-md w-[75%] text-left focus:outline-none focus:ring-2 ${
+            location.pathname === "/" ? "bg-red-500" : "bg-stone-900"
+          }`}
         >
           <img
             loading="lazy"
@@ -130,7 +167,12 @@ const Sidebar: React.FC = () => {
           <span className="basis-auto">Home</span>
         </button>
 
-        <button className="flex gap-4 px-3 py-2.5 mt-5 whitespace-nowrap bg-black rounded-md w-full text-left focus:outline-none focus:ring-2 focus:ring-red-500">
+        <button
+          onClick={() => navigate("/history")}
+          className={`flex gap-4 md w-[75%] px-3 py-2.5 mt-5 whitespace-nowrap rounded-md ml-4 text-left focus:outline-none focus:ring-2 ${
+            location.pathname === "/history" ? "bg-red-500" : "bg-black"
+          }`}
+        >
           <img
             loading="lazy"
             src="https://cdn.builder.io/api/v1/image/assets/TEMP/46930c2ff4b208a18e73462cb80f2cc8f38f506ea1e2ffe858e8a46a3b519d2a?placeholderIfAbsent=true&apiKey=f5b8ba5475bd498da429e6b069b7e677"
@@ -142,7 +184,11 @@ const Sidebar: React.FC = () => {
 
         <button
           onClick={() => navigate("/create-watchlist")}
-          className="px-14 py-3 mt-8 font-bold bg-red-500 rounded-md text-neutral-900 max-md:px-5 focus:outline-none focus:ring-2 focus:ring-red-700"
+          className={`flex gap-4 px-3 py-2.5 mt-5 whitespace-nowrap rounded-md w-full text-left focus:outline-none focus:ring-2 ${
+            location.pathname === "/create-watchlist"
+              ? "bg-red-500"
+              : "bg-black"
+          }`}
         >
           + Create watchlist
         </button>

@@ -197,6 +197,31 @@ let WatchlistService = class WatchlistService {
             };
         }
     }
+    async deleteWatchlistById(watchId) {
+        try {
+            const watchlists = await this.watchlistRepository.findWatchlistById(watchId);
+            if (!watchlists) {
+                return {
+                    error: true,
+                    message: 'Invalid ID',
+                    data: null,
+                };
+            }
+            await this.watchlistRepository.deleteWatchlistById(watchId);
+            return {
+                error: false,
+                message: 'Watchlist deleted successfully',
+                data: null,
+            };
+        }
+        catch (error) {
+            return {
+                error: true,
+                message: `Error deleting watchlists: ${error.message}`,
+                data: null,
+            };
+        }
+    }
 };
 exports.WatchlistService = WatchlistService;
 exports.WatchlistService = WatchlistService = __decorate([

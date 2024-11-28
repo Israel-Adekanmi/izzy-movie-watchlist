@@ -11,7 +11,13 @@ import {
   Delete,
 } from '@nestjs/common';
 import { UsersService } from './user.service';
-import { CreateUserDto, LoginDto, UpdateProfile } from './dto/create-user.dto';
+import {
+  CreateUserDto,
+  ForgotPassDto,
+  LoginDto,
+  tokenDto,
+  UpdateProfile,
+} from './dto/create-user.dto';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { MoviesService } from './movies.service';
 import { AuthGuard } from '../auth/jwt-auth.guard';
@@ -41,6 +47,17 @@ export class UsersController {
     return await this.usersService.create(createUser);
   }
 
+  @Post('/verify-email')
+  @ApiBearerAuth()
+  @UseGuards()
+  @ApiOperation({
+    description: 'Verify user email',
+  })
+  async verifyUserEmail(@Body() tokenData: tokenDto) {
+    //Takes the email and token from the tokenData from the user and sends to the service method
+    return await this.usersService.verifyUserEmail(tokenData);
+  }
+
   @Post('login')
   @ApiBearerAuth()
   //   @UseGuards(LongThrottlerGuard)
@@ -54,6 +71,20 @@ export class UsersController {
     );
 
     return loginData;
+  }
+
+  @Post('forgot-password')
+  @ApiBearerAuth()
+  @UseGuards()
+  @ApiOperation({
+    description: 'User forgot password, send reset email',
+  })
+  async userForgotPassword(@Body() emailPass: ForgotPassDto) {
+    const forgotPass = await this.usersService.userForgotPassword(
+      emailPass.email,
+    );
+
+    return forgotPass;
   }
 
   // Get user profile
@@ -107,6 +138,49 @@ export class UsersController {
   })
   async getMovieDetails(@Param('id') id: number) {
     return await this.moviesService.getMovieDetails(id);
+  }
+
+  @Post('mark-watched/:id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  //   @UseGuards(LongThrottlerGuard)
+  @ApiOperation({
+    description: 'Mark a movie as watched by ID',
+  })
+  async markMovie(@Param('id') id: number, @Request() req: any) {
+    return await this.moviesService.markMovieWatched(id, req.user.userId);
+  }
+
+  @Get('get-movie-history')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  //   @UseGuards(LongThrottlerGuard)
+  @ApiOperation({
+    description: 'Get user movie history',
+  })
+  async getHistory(@Request() req: any) {
+    return await this.moviesService.getHistory(req.user.userId);
+  }
+
+  @Delete('delete-history')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @ApiOperation({
+    description: 'Delete History',
+  })
+  async deleteHistory(@Request() req: any) {
+    return await this.moviesService.deleteHistory(req.user.userId);
+  }
+
+  @Get('get-current-streak')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  //   @UseGuards(LongThrottlerGuard)
+  @ApiOperation({
+    description: 'Get user current streak',
+  })
+  async getCurrentStreak(@Request() req: any) {
+    return await this.moviesService.calculateStreak(req.user.userId);
   }
 
   // Fetch popular movies with pagination
@@ -279,5 +353,15 @@ export class UsersController {
   })
   async getWatchlistById(@Param('id') id: string) {
     return await this.watchlistService.getWatchlistById(id);
+  }
+
+  @Delete('delete-watchlist/:watchlistId')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @ApiOperation({
+    description: 'Delete Watchlist',
+  })
+  async deleteWatchlist(@Param('watchlistId') watchlistId: string) {
+    return await this.watchlistService.deleteWatchlistById(watchlistId);
   }
 }

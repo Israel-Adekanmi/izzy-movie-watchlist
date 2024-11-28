@@ -81,4 +81,11 @@ export class WatchlistRepository {
       { new: true },
     );
   }
+
+  async deleteWatchlistById(watchlistId: string): Promise<WatchlistDocument> {
+    const deletedToken = await this.watchlistModel.findOneAndDelete({
+      watchlistId,
+    });
+    return deletedToken;
+  }
 }

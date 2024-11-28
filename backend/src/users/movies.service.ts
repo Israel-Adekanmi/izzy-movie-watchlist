@@ -1,15 +1,26 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
+import { HistoryRepository } from './repositories/history.repository';
 
 @Injectable()
 export class MoviesService {
   private readonly tmdbApiKey: string;
   private readonly tmdbBaseUrl: string;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private historyRepository: HistoryRepository,
+  ) {
     this.tmdbApiKey = this.configService.get<string>('TMDB_API_KEY');
     this.tmdbBaseUrl = 'https://api.themoviedb.org/3';
+  }
+
+  private formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const day = String(date.getDate()).padStart(2, '0'); // Ensure 2-digit day
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-based
+    return `${year}-${day}-${month}`;
   }
 
   // Search for movies by query
@@ -43,6 +54,175 @@ export class MoviesService {
       },
     });
     return response.data;
+  }
+
+  async deleteHistory(userId: string) {
+    try {
+      const userHistory = await this.historyRepository.findUserHistorys(userId);
+
+      if (!userHistory) {
+        return {
+          error: true,
+          message: 'No User History yet',
+          data: null,
+        };
+      }
+
+      await this.historyRepository.deleteHistoryById(userId);
+
+      return {
+        error: false,
+        message: 'History Cleared',
+        data: null,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        error: true,
+        message: `Error clearing history ${error.message}`,
+        data: null,
+      };
+    }
+  }
+
+  async getHistory(userId: string) {
+    try {
+      const userHistory = await this.historyRepository.findUserHistorys(userId);
+
+      if (!userHistory) {
+        return {
+          error: true,
+          message: 'No User History yet',
+          data: null,
+        };
+      }
+
+      return {
+        error: false,
+        message: 'History Retrieved Successfully',
+        data: userHistory,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        error: true,
+        message: `Error retrieving history ${error.message}`,
+        data: null,
+      };
+    }
+  }
+
+  async markMovieWatched(movieId: number, userId: string) {
+    try {
+      const movie = await this.getMovieDetails(movieId);
+
+      if (!movie) {
+        return {
+          error: true,
+          message: 'Invalid Movie ID',
+          data: null,
+        };
+      }
+
+      const movieData = {
+        id: movie.id,
+        poster_path: movie.poster_path,
+        title: movie.title,
+        release_date: movie.release_date,
+        popularity: movie.popularity,
+      };
+
+      const userHistory = await this.historyRepository.findUserHistorys(userId);
+
+      const today = new Date();
+
+      const formattedDate = this.formatDate(today);
+
+      if (!userHistory) {
+        const historyData = {
+          userId: userId,
+          movies: [movieData],
+          streakDate: [formattedDate],
+        };
+        await this.historyRepository.createHistory(historyData);
+
+        return {
+          error: false,
+          message: 'Movie marked as watched',
+          data: null,
+        };
+      }
+
+      const movieExists = userHistory.movies.some(
+        (existingMovie) => existingMovie.id === movie.id,
+      );
+
+      if (movieExists) {
+        return {
+          error: true,
+          message: 'Movie is already watched',
+          data: null,
+        };
+      }
+
+      const dateExists = userHistory.streakDate.includes(formattedDate);
+
+      const updateData: any = {
+        $push: { movies: movieData },
+      };
+
+      if (!dateExists) {
+        updateData.$push.streakDate = formattedDate;
+      }
+
+      await this.historyRepository.updateHistory(userId, updateData);
+
+      return {
+        error: false,
+        message: 'Movie Marked as Watched',
+        data: null,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        error: true,
+        message: `Error marking movie as watched ${error.message}`,
+        data: null,
+      };
+    }
+  }
+
+  async calculateStreak(userId: string): Promise<number> {
+    const history = await this.historyRepository.findUserHistorys(userId);
+
+    if (
+      !history ||
+      !Array.isArray(history.streakDate) ||
+      history.streakDate.length === 0
+    ) {
+      return 0;
+    }
+
+    // Ensure dates are sorted in descending order
+    const sortedDates = history.streakDate
+      .map((date) => new Date(date))
+      .sort((a, b) => b.getTime() - a.getTime());
+
+    let streakCount = 1;
+
+    for (let i = 1; i < sortedDates.length; i++) {
+      const diffInDays =
+        (sortedDates[i - 1].getTime() - sortedDates[i].getTime()) /
+        (1000 * 60 * 60 * 24);
+
+      if (diffInDays === 1) {
+        streakCount++;
+      } else {
+        break;
+      }
+    }
+
+    return streakCount;
   }
 
   // Fetch popular movies

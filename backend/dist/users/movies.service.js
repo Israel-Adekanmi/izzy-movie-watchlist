@@ -13,11 +13,19 @@ exports.MoviesService = void 0;
 const common_1 = require("@nestjs/common");
 const axios_1 = require("axios");
 const config_1 = require("@nestjs/config");
+const history_repository_1 = require("./repositories/history.repository");
 let MoviesService = class MoviesService {
-    constructor(configService) {
+    constructor(configService, historyRepository) {
         this.configService = configService;
+        this.historyRepository = historyRepository;
         this.tmdbApiKey = this.configService.get('TMDB_API_KEY');
         this.tmdbBaseUrl = 'https://api.themoviedb.org/3';
+    }
+    formatDate(date) {
+        const year = date.getFullYear();
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        return `${year}-${day}-${month}`;
     }
     async searchMovies(query, page) {
         try {
@@ -45,6 +53,144 @@ let MoviesService = class MoviesService {
             },
         });
         return response.data;
+    }
+    async deleteHistory(userId) {
+        try {
+            const userHistory = await this.historyRepository.findUserHistorys(userId);
+            if (!userHistory) {
+                return {
+                    error: true,
+                    message: 'No User History yet',
+                    data: null,
+                };
+            }
+            await this.historyRepository.deleteHistoryById(userId);
+            return {
+                error: false,
+                message: 'History Cleared',
+                data: null,
+            };
+        }
+        catch (error) {
+            console.log(error);
+            return {
+                error: true,
+                message: `Error clearing history ${error.message}`,
+                data: null,
+            };
+        }
+    }
+    async getHistory(userId) {
+        try {
+            const userHistory = await this.historyRepository.findUserHistorys(userId);
+            if (!userHistory) {
+                return {
+                    error: true,
+                    message: 'No User History yet',
+                    data: null,
+                };
+            }
+            return {
+                error: false,
+                message: 'History Retrieved Successfully',
+                data: userHistory,
+            };
+        }
+        catch (error) {
+            console.log(error);
+            return {
+                error: true,
+                message: `Error retrieving history ${error.message}`,
+                data: null,
+            };
+        }
+    }
+    async markMovieWatched(movieId, userId) {
+        try {
+            const movie = await this.getMovieDetails(movieId);
+            if (!movie) {
+                return {
+                    error: true,
+                    message: 'Invalid Movie ID',
+                    data: null,
+                };
+            }
+            const movieData = {
+                id: movie.id,
+                poster_path: movie.poster_path,
+                title: movie.title,
+                release_date: movie.release_date,
+                popularity: movie.popularity,
+            };
+            const userHistory = await this.historyRepository.findUserHistorys(userId);
+            const today = new Date();
+            const formattedDate = this.formatDate(today);
+            if (!userHistory) {
+                const historyData = {
+                    userId: userId,
+                    movies: [movieData],
+                    streakDate: [formattedDate],
+                };
+                await this.historyRepository.createHistory(historyData);
+                return {
+                    error: false,
+                    message: 'Movie marked as watched',
+                    data: null,
+                };
+            }
+            const movieExists = userHistory.movies.some((existingMovie) => existingMovie.id === movie.id);
+            if (movieExists) {
+                return {
+                    error: true,
+                    message: 'Movie is already watched',
+                    data: null,
+                };
+            }
+            const dateExists = userHistory.streakDate.includes(formattedDate);
+            const updateData = {
+                $push: { movies: movieData },
+            };
+            if (!dateExists) {
+                updateData.$push.streakDate = formattedDate;
+            }
+            await this.historyRepository.updateHistory(userId, updateData);
+            return {
+                error: false,
+                message: 'Movie Marked as Watched',
+                data: null,
+            };
+        }
+        catch (error) {
+            console.log(error);
+            return {
+                error: true,
+                message: `Error marking movie as watched ${error.message}`,
+                data: null,
+            };
+        }
+    }
+    async calculateStreak(userId) {
+        const history = await this.historyRepository.findUserHistorys(userId);
+        if (!history ||
+            !Array.isArray(history.streakDate) ||
+            history.streakDate.length === 0) {
+            return 0;
+        }
+        const sortedDates = history.streakDate
+            .map((date) => new Date(date))
+            .sort((a, b) => b.getTime() - a.getTime());
+        let streakCount = 1;
+        for (let i = 1; i < sortedDates.length; i++) {
+            const diffInDays = (sortedDates[i - 1].getTime() - sortedDates[i].getTime()) /
+                (1000 * 60 * 60 * 24);
+            if (diffInDays === 1) {
+                streakCount++;
+            }
+            else {
+                break;
+            }
+        }
+        return streakCount;
     }
     async getPopularMovies(page) {
         try {
@@ -193,6 +339,7 @@ let MoviesService = class MoviesService {
 exports.MoviesService = MoviesService;
 exports.MoviesService = MoviesService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [config_1.ConfigService])
+    __metadata("design:paramtypes", [config_1.ConfigService,
+        history_repository_1.HistoryRepository])
 ], MoviesService);
 //# sourceMappingURL=movies.service.js.map

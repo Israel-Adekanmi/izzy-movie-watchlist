@@ -52,12 +52,12 @@ const SignupPage: React.FC = () => {
       } else {
         setFeedback({
           type: "success",
-          message: "Profile created successfully!, Redirecting to Login",
+          message: data.message,
         });
         // Redirect to the login page after a short delay
         setTimeout(() => {
           navigate("/login");
-        }, 1500);
+        }, 3500);
       }
     } catch (err: any) {
       setFeedback({

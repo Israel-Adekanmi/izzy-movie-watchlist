@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from './repositories/user.repository';
 import * as bcrypt from 'bcryptjs';
-import { CreateUserDto, UpdateProfile } from './dto/create-user.dto';
+import { CreateUserDto, tokenDto, UpdateProfile } from './dto/create-user.dto';
 import { AuthService } from '../auth/auth.service';
+import { EmailService } from 'src/common/email/email.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private userRepository: UsersRepository,
     private authService: AuthService,
+    private emailService: EmailService,
   ) {}
 
   private generateUserId(): string {
@@ -24,6 +26,23 @@ export class UsersService {
     }
 
     return userId;
+  }
+
+  private generateRandomToken(): string {
+    const randomNum = Math.floor(Math.random() * 900000) + 100000;
+    return randomNum.toString();
+  }
+
+  private generateRandomPassword(): string {
+    const charset =
+      'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let password = '';
+    const length = 8;
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      password += charset[randomIndex];
+    }
+    return password;
   }
 
   async create(userData: CreateUserDto) {
@@ -57,7 +76,7 @@ export class UsersService {
 
       // Generate userId and verification token
       const userId = this.generateUserId();
-      //   const verificationToken = this.generateRandomToken();
+      const verificationToken = this.generateRandomToken();
 
       // Prepare user data
       const userDataWithId = {
@@ -71,29 +90,28 @@ export class UsersService {
       };
 
       // Store the token in the database
-      //   const tokenData = {
-      //     token: verificationToken,
-      //     email: userData.email,
-      //     signUpType: SignUpType.user,
-      //   };
-      //   await this.userRepository.storeToken(tokenData);
+      const tokenData = {
+        token: verificationToken,
+        email: userData.email,
+      };
+      await this.userRepository.storeToken(tokenData);
 
-      //   // Send verification email
-      //   try {
-      //     await this.emailService.sendVerificationEmail(
-      //       userData.email,
-      //       verificationToken,
-      //     );
-      //   } catch (error) {
-      //     console.error('Error sending verification email:', error);
-      //   }
+      // Send verification email
+      try {
+        await this.emailService.sendVerificationEmail(
+          userData.email,
+          verificationToken,
+        );
+      } catch (error) {
+        console.error('Error sending verification email:', error);
+      }
 
       // Store user profile details in the database
       await this.userRepository.createUser(userDataWithId);
 
       return {
         error: false,
-        message: 'Sign Up Succesful',
+        message: 'Email Verification Token Sent. Please check your inbox.',
         data: null,
       };
     } catch (error) {
@@ -103,6 +121,154 @@ export class UsersService {
         message: 'Error signing user up',
         data: null,
       };
+    }
+  }
+
+  async verifyUserEmail(verifyTokenData: tokenDto) {
+    const userData = await this.userRepository.findUserByEmail(
+      verifyTokenData.email,
+    );
+
+    //Checks if user profile exists
+    if (!userData) {
+      return {
+        error: true,
+        message: 'User does not exist, Invalid email',
+        data: null,
+      };
+    }
+
+    //Checks if user email is verified
+    if (userData.isEmailVerified === true) {
+      return {
+        error: true,
+        message: 'Email has been verified, proceed to login',
+        data: null,
+      };
+    }
+
+    const userToken = await this.userRepository.findTokenByEmail(
+      verifyTokenData.email,
+    );
+
+    //Checks If user token matches
+    if (userToken.token !== verifyTokenData.token) {
+      return {
+        error: true,
+        message: 'Token is incorrect. Check and try again',
+        data: null,
+      };
+    }
+
+    //Gets the current time now
+    const currentTime = new Date();
+    const tokenCreationTime = userToken.updatedAt;
+
+    //Calculates the date of expiration by adding 6 hrs to the time at which the token was created
+    const expirationTime = new Date(
+      tokenCreationTime.getTime() + 6 * 60 * 60 * 1000,
+    ); // Add 6 hours in milliseconds
+
+    //Checks if token is expired
+    if (currentTime > expirationTime) {
+      try {
+        //Generate a new token if the token has expired
+        const newToken = this.generateRandomToken();
+
+        //Update and store in the db with the new token
+        const updateTokenData = {
+          token: newToken,
+          updatedAt: currentTime,
+        };
+
+        await this.userRepository.updateUserToken(
+          verifyTokenData.email,
+          updateTokenData,
+        );
+
+        //Send an email to the user with the new token
+        await this.emailService.sendVerificationEmail(
+          userToken.email,
+          newToken,
+        );
+
+        return {
+          error: false,
+          message:
+            'Verification token has expired. Check inbox for a new token',
+          data: null,
+        };
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    try {
+      //Update the user profile to true after successfull verification
+      const isEmailVerified = true;
+
+      const newUserData = await this.userRepository.findUserByEmailAndUpdate(
+        verifyTokenData.email,
+        isEmailVerified,
+      );
+
+      //Delete the token data from the db
+      await this.userRepository.deleteTokenByEmail(verifyTokenData.email);
+
+      return {
+        error: false,
+        message: 'Email has been verified, proceed to login!',
+        data: newUserData,
+      };
+    } catch (error) {
+      return {
+        error: true,
+        message: `Error creating user ${error.message}`,
+        data: null,
+      };
+    }
+  }
+
+  async userForgotPassword(email: string) {
+    //Generate a new reset password for user
+    const randomPassowrd = this.generateRandomPassword();
+
+    try {
+      const findUser = await this.userRepository.findUserByEmail(email);
+
+      if (!findUser) {
+        return {
+          error: true,
+          message: 'This email does not exist, try signing up',
+          data: null,
+        };
+      }
+      await this.emailService.sendResetPassword(email, randomPassowrd);
+      // return sendEmailForReset;
+    } catch (error) {
+      console.log(error);
+    }
+    try {
+      //Hash the newly generated password
+      const hashedRandomPassword = await bcrypt.hash(randomPassowrd, 10);
+      const updateUserPassword = {
+        password: hashedRandomPassword,
+      };
+
+      //Update the user data with the new password
+      await this.userRepository.findUserEmailAndUpdate(
+        email,
+        updateUserPassword,
+      );
+
+      return {
+        error: false,
+        message: 'A Reset Password Has Been Sent To The Email',
+        data: null,
+      };
+    } catch (error) {
+      console.log(error);
+      return { error: 'Error sending reset password', message: error.message };
     }
   }
 

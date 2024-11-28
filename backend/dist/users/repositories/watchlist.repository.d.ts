@@ -15,4 +15,5 @@ export declare class WatchlistRepository {
         popularity: number;
     }): Promise<WatchlistDocument | null>;
     removeMovieFromWatchlist(watchlistId: string, movieId: number): Promise<WatchlistDocument | null>;
+    deleteWatchlistById(watchlistId: string): Promise<WatchlistDocument>;
 }

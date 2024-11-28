@@ -17,3 +17,14 @@ export declare class LoginDto {
     email: string;
     password: string;
 }
+export declare class tokenDto {
+    email: string;
+    token: string;
+}
+export declare class ForgotPassDto {
+    email: string;
+}
+export declare class UpdateTokenDto {
+    token: string;
+    updatedAt: Date;
+}

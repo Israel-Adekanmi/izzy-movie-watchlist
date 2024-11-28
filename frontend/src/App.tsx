@@ -9,6 +9,8 @@ import MovieDetailsPage from './watchlist/pages/MoviesDetails';
 import EditWatchlist from './watchlist/pages/EditWatchlist';
 import WatchlistDetails from './watchlist/pages/WatchlistDetails';
 import ProtectedRoute from './context/ProtectedRoute';
+import VerifyEmailPage from './watchlist/pages/VerifyEmail';
+import HistoryPage from './watchlist/pages/HistoryPage';
 
 function App() {
   return (
@@ -17,6 +19,7 @@ function App() {
         <Route path="/" element={<WatchlistPage />} />
         <Route path="/login" element={<GuestLogin />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
         <Route
           path="/create-watchlist"
           element={
@@ -30,6 +33,14 @@ function App() {
           element={
             <ProtectedRoute>
               <EditProfile />
+            </ProtectedRoute>
+          }
+        />
+         <Route
+          path="/history"
+          element={
+            <ProtectedRoute>
+              <HistoryPage />
             </ProtectedRoute>
           }
         />

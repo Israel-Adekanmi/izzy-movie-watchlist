@@ -77,6 +77,27 @@ const MovieDetailsCard: React.FC<MovieDetailsCardProps> = ({
     }
   };
 
+  const handleMarkAsWatched = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/mark-watched/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.message);
+      setFeedback({
+        type: "success",
+        message: "Movie marked as watched successfully!",
+      });
+    } catch (error: any) {
+      setFeedback({ type: "error", message: error.message });
+    }
+  };
+
+
   return (
     <article className="flex flex-col w-full">
       <div className="flex flex-col md:flex-row bg-stone-900 rounded p-5 gap-5">
@@ -139,12 +160,20 @@ const MovieDetailsCard: React.FC<MovieDetailsCardProps> = ({
           </div>
 
           {/* Add to Watchlist Button */}
-          <button
-            onClick={fetchWatchlists}
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-          >
-            Add to Watchlist
-          </button>
+          <div className="flex flex-wrap gap-4">
+            <button
+              onClick={fetchWatchlists}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >
+              Add to Watchlist
+            </button>
+            <button
+              onClick={handleMarkAsWatched}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
+              Mark as Watched
+            </button>
+          </div>
         </div>
       </div>
 

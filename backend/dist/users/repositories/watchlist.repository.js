@@ -52,6 +52,12 @@ let WatchlistRepository = class WatchlistRepository {
     async removeMovieFromWatchlist(watchlistId, movieId) {
         return await this.watchlistModel.findOneAndUpdate({ watchlistId }, { $pull: { movies: { id: movieId } } }, { new: true });
     }
+    async deleteWatchlistById(watchlistId) {
+        const deletedToken = await this.watchlistModel.findOneAndDelete({
+            watchlistId,
+        });
+        return deletedToken;
+    }
 };
 exports.WatchlistRepository = WatchlistRepository;
 exports.WatchlistRepository = WatchlistRepository = __decorate([
