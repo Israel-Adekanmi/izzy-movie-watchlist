@@ -129,6 +129,12 @@ let UsersController = class UsersController {
     async getUserReminders(req) {
         return await this.usersService.getNotifications(req.user.userId);
     }
+    async deleteReminder(id) {
+        return await this.usersService.cancelReminder(id);
+    }
+    async markReminderSent(reminderId) {
+        return await this.usersService.markReminderAsSent(reminderId);
+    }
 };
 exports.UsersController = UsersController;
 __decorate([
@@ -487,6 +493,30 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getUserReminders", null);
+__decorate([
+    (0, common_1.Delete)('delete-reminder/:id'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.AuthGuard),
+    (0, swagger_1.ApiOperation)({
+        description: 'Delete Reminder',
+    }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "deleteReminder", null);
+__decorate([
+    (0, common_1.Patch)('mark-reminder/:reminderId'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.AuthGuard),
+    (0, swagger_1.ApiOperation)({
+        description: 'Mark Reminder',
+    }),
+    __param(0, (0, common_1.Param)('reminderId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "markReminderSent", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [user_service_1.UsersService,

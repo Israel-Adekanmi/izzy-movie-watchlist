@@ -354,6 +354,9 @@ let UsersService = class UsersService {
     async sendReminderNotifications() {
         const currentTime = new Date();
         const pendingReminders = await this.reminderRepository.findPendingReminders(currentTime);
+        if (!pendingReminders.length) {
+            return;
+        }
         for (const reminder of pendingReminders) {
             try {
                 await this.emailService.sendReminder(reminder.email, reminder.movieTitle, reminder.reminderTime.toLocaleString());
@@ -363,6 +366,55 @@ let UsersService = class UsersService {
             catch (error) {
                 console.error('Error sending reminder:', error);
             }
+        }
+    }
+    async cancelReminder(id) {
+        try {
+            await this.reminderRepository.deleteReminderById(id);
+            return {
+                error: false,
+                message: 'Reminder canceled succesfully',
+                data: null,
+            };
+        }
+        catch (error) {
+            return {
+                error: true,
+                message: `Error setting reminder: ${error.message}`,
+                data: null,
+            };
+        }
+    }
+    async markReminderAsSent(reminderId) {
+        try {
+            const reminder = await this.reminderRepository.findReminderById(reminderId);
+            if (!reminder) {
+                return {
+                    error: false,
+                    message: 'Reminder Does Not Exist',
+                    data: null,
+                };
+            }
+            if (reminder.isSent === true) {
+                return {
+                    error: false,
+                    message: 'Reminder has already marked as sent succesfully',
+                    data: null,
+                };
+            }
+            await this.reminderRepository.deleteReminderById(reminderId);
+            return {
+                error: false,
+                message: 'Reminder marked as sent succesfully',
+                data: null,
+            };
+        }
+        catch (error) {
+            return {
+                error: true,
+                message: `Error setting reminder: ${error.message}`,
+                data: null,
+            };
         }
     }
 };

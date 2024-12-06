@@ -13,8 +13,12 @@ import VerifyEmailPage from './watchlist/pages/VerifyEmail';
 import HistoryPage from './watchlist/pages/HistoryPage';
 import ReminderPage from './watchlist/pages/ReminderPage';
 import MoodRecommendationPage from './watchlist/pages/MoodSearch';
+import ReminderNotification from './watchlist/components/NotificationPopup';
+import useReminderNotifications from './context/ReminderService';
 
 function App() {
+  const { showReminder, setShowReminder, reminderMessage } = useReminderNotifications();
+
   return (
     <BrowserRouter>
       <Routes>
@@ -87,6 +91,13 @@ function App() {
           }
         />
       </Routes>
+      {/* Render the notification popup if it's triggered */}
+      {showReminder && (
+        <ReminderNotification 
+          message={reminderMessage} 
+          onClose={() => setShowReminder(false)} 
+        />
+      )}
     </BrowserRouter>
   );
 }

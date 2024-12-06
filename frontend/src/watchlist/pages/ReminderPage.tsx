@@ -29,6 +29,7 @@ const ReminderPage: React.FC = () => {
   const navigate = useNavigate();
   const [reminders, setReminders] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [rowLoading, setRowLoading] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{
     type: "error" | "success";
     message: string;
@@ -69,6 +70,40 @@ const ReminderPage: React.FC = () => {
     }
   }, [token]);
 
+  const handleCancelReminder = async (id: string) => {
+    setRowLoading(id);
+    try {
+      const response = await fetch(`${BASE_URL}/delete-reminder/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        setFeedback({ type: "error", message: data.message });
+      } else {
+        setFeedback({
+          type: "success",
+          message: "Reminder cancelled successfully!",
+        });
+        // Remove the movie from the local state
+        setReminders((prevReminder) =>
+          prevReminder.filter((reminder) => reminder._id !== id)
+        );
+      }
+    } catch (err: any) {
+      setFeedback({
+        type: "error",
+        message: err.message || "Failed to cancel the reminder",
+      });
+    } finally {
+      setRowLoading(null);
+    }
+  };
 
   return (
     <div className="flex flex-col bg-black">
@@ -109,6 +144,9 @@ const ReminderPage: React.FC = () => {
                       <th className="border border-gray-700 px-4 py-2 text-left">
                         Reminder Time
                       </th>
+                      <th className="border border-gray-700 px-4 py-2 text-left">
+                        Cancel Reminder
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -132,6 +170,24 @@ const ReminderPage: React.FC = () => {
                           </td>
                           <td className="border border-gray-600 px-4 py-2 text-center text-white">
                             {time}
+                          </td>
+                          <td className="border border-gray-600 px-4 py-2 text-center text-white">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCancelReminder(reminder._id);
+                              }}
+                              className={`px-4 py-2 rounded ${
+                                rowLoading === reminder._id
+                                  ? "bg-gray-500 cursor-wait"
+                                  : "bg-red-500 hover:bg-red-700"
+                              }`}
+                              disabled={rowLoading === reminder._id}
+                            >
+                              {rowLoading === reminder._id
+                                ? "Cancelling..."
+                                : "Cancel"}
+                            </button>
                           </td>
                         </tr>
                       );

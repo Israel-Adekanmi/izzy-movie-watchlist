@@ -47,4 +47,14 @@ export declare class UsersService {
     setReminder(userId: string, movieId: number, reminderTime: string): Promise<any>;
     getNotifications(userId: string): Promise<any>;
     sendReminderNotifications(): Promise<void>;
+    cancelReminder(id: string): Promise<{
+        error: boolean;
+        message: string;
+        data: any;
+    }>;
+    markReminderAsSent(reminderId: string): Promise<{
+        error: boolean;
+        message: string;
+        data: any;
+    }>;
 }

@@ -115,9 +115,9 @@ export class ReminderRepository {
     }
   }
 
-  async deleteReminderById(userId: string): Promise<ReminderDocument> {
+  async deleteReminderById(id: string): Promise<ReminderDocument> {
     const deletedToken = await this.reminderModel.findOneAndDelete({
-      userId,
+      _id: id,
     });
     return deletedToken;
   }

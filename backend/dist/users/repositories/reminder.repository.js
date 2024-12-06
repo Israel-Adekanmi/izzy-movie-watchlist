@@ -78,9 +78,9 @@ let ReminderRepository = class ReminderRepository {
             return null;
         }
     }
-    async deleteReminderById(userId) {
+    async deleteReminderById(id) {
         const deletedToken = await this.reminderModel.findOneAndDelete({
-            userId,
+            _id: id,
         });
         return deletedToken;
     }

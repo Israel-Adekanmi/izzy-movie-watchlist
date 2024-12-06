@@ -9,6 +9,7 @@ import {
   UseGuards,
   Put,
   Delete,
+  Patch,
 } from '@nestjs/common';
 import { UsersService } from './user.service';
 import {
@@ -401,5 +402,25 @@ export class UsersController {
   })
   async getUserReminders(@Request() req: any) {
     return await this.usersService.getNotifications(req.user.userId);
+  }
+
+  @Delete('delete-reminder/:id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @ApiOperation({
+    description: 'Delete Reminder',
+  })
+  async deleteReminder(@Param('id') id: string) {
+    return await this.usersService.cancelReminder(id);
+  }
+
+  @Patch('mark-reminder/:reminderId')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @ApiOperation({
+    description: 'Mark Reminder',
+  })
+  async markReminderSent(@Param('reminderId') reminderId: string) {
+    return await this.usersService.markReminderAsSent(reminderId);
   }
 }

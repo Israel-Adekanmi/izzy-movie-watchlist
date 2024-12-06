@@ -24,9 +24,9 @@ let MoviesService = class MoviesService {
     }
     formatDate(date) {
         const year = date.getFullYear();
-        const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0');
-        return `${year}-${day}-${month}`;
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
     async searchMovies(query, page) {
         try {
@@ -126,6 +126,7 @@ let MoviesService = class MoviesService {
             const userHistory = await this.historyRepository.findUserHistorys(userId);
             const today = new Date();
             const formattedDate = this.formatDate(today);
+            console.log('formated date:', formattedDate);
             if (!userHistory) {
                 const historyData = {
                     userId: userId,
@@ -148,6 +149,7 @@ let MoviesService = class MoviesService {
                 };
             }
             const dateExists = userHistory.streakDate.includes(formattedDate);
+            console.log('date exists:', dateExists);
             const updateData = {
                 $push: { movies: movieData },
             };
@@ -177,13 +179,17 @@ let MoviesService = class MoviesService {
             history.streakDate.length === 0) {
             return 0;
         }
+        console.log('history streak date:', history.streakDate);
         const sortedDates = history.streakDate
             .map((date) => new Date(date))
             .sort((a, b) => b.getTime() - a.getTime());
+        console.log('sorted date:', sortedDates);
         let streakCount = 1;
         for (let i = 1; i < sortedDates.length; i++) {
             const diffInDays = (sortedDates[i - 1].getTime() - sortedDates[i].getTime()) /
                 (1000 * 60 * 60 * 24);
+            console.log(sortedDates[i - 1], sortedDates[i]);
+            console.log('diff in date:', diffInDays);
             if (diffInDays === 1) {
                 streakCount++;
             }

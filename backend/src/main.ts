@@ -41,8 +41,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/v1/docs', app, document);
 
-  const port = process.env.DEPLOYMENT_PORT || 3016; // Default to 3000 if PORT is not set
-  // const port = 3015;
+  // const port = process.env.DEPLOYMENT_PORT || 3016; // Default to 3000 if PORT is not set
+  const port = 3015;
   await app.listen(port);
 
   // Initialize the app without listening (for serverless compatibility)

@@ -21,6 +21,16 @@ interface MovieDetailsCardProps {
   homepage: string; // Official homepage URL
 }
 
+export interface Reminder {
+    _id: string; // Assuming _id is a string
+    userId: string;
+    movieId: number;
+    movieTitle: string;
+    email: string;
+    reminderTime: Date;
+    isSent: boolean;
+  }
+
 interface SearchBarProps {
   onSearch: (query: string) => void;
   buttonText: string;

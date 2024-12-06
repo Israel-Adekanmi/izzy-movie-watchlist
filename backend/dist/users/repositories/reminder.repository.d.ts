@@ -23,5 +23,5 @@ export declare class ReminderRepository {
         release_date: string;
         popularity: number;
     }, date: string): Promise<ReminderDocument | null>;
-    deleteReminderById(userId: string): Promise<ReminderDocument>;
+    deleteReminderById(id: string): Promise<ReminderDocument>;
 }

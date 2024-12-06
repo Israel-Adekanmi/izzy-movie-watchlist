@@ -101,9 +101,12 @@ export class HistoryRepository {
   }
 
   async deleteHistoryById(userId: string): Promise<HistoryDocument> {
-    const deletedToken = await this.historyModel.findOneAndDelete({
-      userId,
-    });
-    return deletedToken;
+    const updatedHistory = await this.historyModel.findOneAndUpdate(
+      { userId }, // Find the document by userId
+      { $set: { movies: [] } }, // Clear the movies array
+      { new: true }, // Return the updated document
+    );
+
+    return updatedHistory;
   }
 }

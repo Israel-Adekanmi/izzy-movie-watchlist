@@ -68,10 +68,8 @@ let HistoryRepository = class HistoryRepository {
         }
     }
     async deleteHistoryById(userId) {
-        const deletedToken = await this.historyModel.findOneAndDelete({
-            userId,
-        });
-        return deletedToken;
+        const updatedHistory = await this.historyModel.findOneAndUpdate({ userId }, { $set: { movies: [] } }, { new: true });
+        return updatedHistory;
     }
 };
 exports.HistoryRepository = HistoryRepository;

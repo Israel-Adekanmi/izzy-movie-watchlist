@@ -117,7 +117,7 @@ const Sidebar: React.FC = () => {
   return (
     <aside className="flex flex-col w-[19%] max-md:ml-0 max-md:w-full">
       <nav className="flex flex-col items-start self-stretch my-auto h-full w-full text-base text-center text-neutral-200 max-md:mt-10">
-        <h1 className="pt-4 ml-3 text-3xl font-extrabold text-red-500 max-md:ml-2.5">
+        <h1 className="pt-4 ml-3 text-3xl font-extrabold pl-3 text-red-500 max-md:ml-2.5">
           IzzyWatch
         </h1>
 
@@ -206,13 +206,13 @@ const Sidebar: React.FC = () => {
 
         <button
           onClick={() => navigate("/create-watchlist")}
-          className={`flex gap-4 px-3 py-2.5 mt-5 whitespace-nowrap rounded-md w-full text-left focus:outline-none focus:ring-2 ${
+          className={`flex gap-4 px-3 py-2.5 mt-5 whitespace-nowrap pl-7 rounded-md w-full text-left focus:outline-none focus:ring-2 ${
             location.pathname === "/create-watchlist"
               ? "bg-red-500"
               : "bg-black"
           }`}
         >
-          + Create watchlist
+          +  Create watchlist
         </button>
 
         <hr className="shrink-0 self-stretch mt-5 h-px border border-solid border-zinc-300 border-opacity-30" />
@@ -258,7 +258,7 @@ const Sidebar: React.FC = () => {
         {userFirstName && (
           <button
             onClick={handleLogout}
-            className="text-red-500 text-2xl focus:outline-none"
+            className="text-red-500 pl-5 text-2xl focus:outline-none"
           >
             Logout
           </button>

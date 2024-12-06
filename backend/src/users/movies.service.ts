@@ -19,9 +19,9 @@ export class MoviesService {
 
   private formatDate(date: Date): string {
     const year = date.getFullYear();
-    const day = String(date.getDate()).padStart(2, '0'); // Ensure 2-digit day
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-based
-    return `${year}-${day}-${month}`;
+    const day = String(date.getDate()).padStart(2, '0'); // Ensure 2-digit day
+    return `${year}-${month}-${day}`;
   }
 
   // Search for movies by query
@@ -139,6 +139,8 @@ export class MoviesService {
 
       const formattedDate = this.formatDate(today);
 
+      console.log('formated date:', formattedDate);
+
       if (!userHistory) {
         const historyData = {
           userId: userId,
@@ -168,6 +170,7 @@ export class MoviesService {
 
       const dateExists = userHistory.streakDate.includes(formattedDate);
 
+      console.log('date exists:', dateExists);
       const updateData: any = {
         $push: { movies: movieData },
       };
@@ -204,10 +207,14 @@ export class MoviesService {
       return 0;
     }
 
+    console.log('history streak date:', history.streakDate);
+
     // Ensure dates are sorted in descending order
     const sortedDates = history.streakDate
       .map((date) => new Date(date))
       .sort((a, b) => b.getTime() - a.getTime());
+
+    console.log('sorted date:', sortedDates);
 
     let streakCount = 1;
 
@@ -215,6 +222,9 @@ export class MoviesService {
       const diffInDays =
         (sortedDates[i - 1].getTime() - sortedDates[i].getTime()) /
         (1000 * 60 * 60 * 24);
+
+      console.log(sortedDates[i - 1], sortedDates[i]);
+      console.log('diff in date:', diffInDays);
 
       if (diffInDays === 1) {
         streakCount++;

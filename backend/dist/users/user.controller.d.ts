@@ -102,4 +102,14 @@ export declare class UsersController {
     }>;
     setReminder(req: any, setReminderData: SetReminderDto): Promise<any>;
     getUserReminders(req: any): Promise<any>;
+    deleteReminder(id: string): Promise<{
+        error: boolean;
+        message: string;
+        data: any;
+    }>;
+    markReminderSent(reminderId: string): Promise<{
+        error: boolean;
+        message: string;
+        data: any;
+    }>;
 }
